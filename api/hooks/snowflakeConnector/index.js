@@ -14,6 +14,7 @@ module.exports = function (sails) {
                 account: process.env.SNOWFLAKE_ACCOUNT,
                 database: process.env.SNOWFLAKE_DATABASE,
                 password: process.env.SNOWFLAKE_PASSWORD,
+                schema: process.env.SNOWFLAKE_SCHEMA,
             });
 
             connection.connect(function (err, conn) {

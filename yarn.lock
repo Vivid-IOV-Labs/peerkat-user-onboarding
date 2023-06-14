@@ -1593,6 +1593,13 @@ core-util-is@~1.0.0:
   resolved "https://registry.yarnpkg.com/core-util-is/-/core-util-is-1.0.3.tgz#a6042d3634c2b27e9328f837b965fac83808db85"
   integrity sha512-ZQBvi1DcpJ4GDqanjucZ2Hj3wEO5pZDS89BWbkcrvdxksJorwUDDZamX9ldFkp9aw2lmBDLgkObEA4DWNJ9FYQ==
 
+cron@1.8.2:
+  version "1.8.2"
+  resolved "https://registry.yarnpkg.com/cron/-/cron-1.8.2.tgz#4ac5e3c55ba8c163d84f3407bde94632da8370ce"
+  integrity sha512-Gk2c4y6xKEO8FSAUTklqtfSr7oTq0CiPQeLBG5Fl0qoXpZyMcj1SG59YL+hqq04bu6/IuEA7lMkYDAplQNKkyg==
+  dependencies:
+    moment-timezone "^0.5.x"
+
 cross-spawn@4.0.2:
   version "4.0.2"
   resolved "https://registry.yarnpkg.com/cross-spawn/-/cross-spawn-4.0.2.tgz#7b9247621c23adfdd3856004a823cbe397424d41"
@@ -3787,7 +3794,7 @@ mock-require@^3.0.3:
     get-caller-file "^1.0.2"
     normalize-path "^2.1.1"
 
-moment-timezone@^0.5.15:
+moment-timezone@^0.5.15, moment-timezone@^0.5.x:
   version "0.5.43"
   resolved "https://registry.yarnpkg.com/moment-timezone/-/moment-timezone-0.5.43.tgz#3dd7f3d0c67f78c23cd1906b9b2137a09b3c4790"
   integrity sha512-72j3aNyuIsDxdF1i7CEgV2FfxM1r6aaqJyLB2vwb33mXYyoyLly+F1zbWqhA3/bVIoJ4szlUoMbUnVdid32NUQ==
@@ -4763,6 +4770,13 @@ sails-generate@^2.0.3:
     read "1.0.7"
     reportback "^2.0.1"
     sails.io.js-dist "^1.0.0"
+
+sails-hook-cron@^3.2.0:
+  version "3.2.0"
+  resolved "https://registry.yarnpkg.com/sails-hook-cron/-/sails-hook-cron-3.2.0.tgz#bc37dfad6d55085699fc2d61012771a57f563062"
+  integrity sha512-Y9YCaPcvBcnwLJVzUTR40wSfBCXbkcj1GZFr32YvyuRQFsXblMxWJQuHXZRepJjfoc+Kg5/0kBt2pBMoeYbj8A==
+  dependencies:
+    cron "1.8.2"
 
 sails-hook-grunt@^5.0.0:
   version "5.0.0"

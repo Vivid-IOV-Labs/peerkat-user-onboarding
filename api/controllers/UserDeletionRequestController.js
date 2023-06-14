@@ -1,29 +1,68 @@
 const queries = require('../../config/queries');
 
-async function userDelete(req, res) {
+async function deleteUser(req, res) {
     const snowflakeConnection = sails.hooks.snowflake.connection;
 
     const { userId } = req.allParams();
 
     try {
+        if (!userId) {
+            return res.badRequest('Missing mandatory fields, please try again');
+        }
+
         // Check if the user exists
-        const selectUserStmt = snowflakeConnection.execute({
-            sqlText: queries.selectUserById,
-            binds: [userId],
+        const result = await new Promise((resolve, reject) => {
+            snowflakeConnection.execute({
+                sqlText: queries.selectUserByUserId.replace('?', userId),
+                complete: (err, stmt, rows) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(rows);
+                    }
+                },
+            });
         });
 
-        const selectUserResult = await selectUserStmt.fetchOne();
-        if (!selectUserResult) {
+        if (!result.length) {
             return res.badRequest('User does not exist');
         }
 
-        // Store user deletion request in USER_DELETION_AUDIT table
-        const insertDeletionRequestStmt = snowflakeConnection.execute({
-            sqlText: queries.insertUserDeletionRequest,
-            binds: [userId, new Date(), null, null],
+        // Check if deletion request already exists
+        const deletionRequestResult = await new Promise((resolve, reject) => {
+            snowflakeConnection.execute({
+                sqlText: queries.selectUserDeletionRequest.replace('?', userId),
+                complete: (err, stmt, rows) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve(rows);
+                    }
+                },
+            });
         });
 
-        await insertDeletionRequestStmt.execute();
+        if (deletionRequestResult.length) {
+            return res.badRequest('Deletion request already exists');
+        }
+
+        // Store user deletion request in USER_DELETION_AUDIT table
+        await new Promise((resolve, reject) => {
+            snowflakeConnection.execute({
+                sqlText: queries.insertUserDeletionRequest
+                    .replace('?', userId)
+                    .replace('?', `'${new Date().toISOString()}'`)
+                    .replace('?', 'null')
+                    .replace('?', 'null'),
+                complete: (err) => {
+                    if (err) {
+                        reject(err);
+                    } else {
+                        resolve();
+                    }
+                },
+            });
+        });
 
         return res.ok('Deletion request recorded');
     } catch (error) {
@@ -32,5 +71,5 @@ async function userDelete(req, res) {
 }
 
 module.exports = {
-    userDelete,
+    deleteUser,
 };
