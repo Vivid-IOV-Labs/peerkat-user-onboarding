@@ -17,18 +17,23 @@ async function createUser(req, res) {
         blockchainId,
     } = req.allParams();
 
-    // Check if mandatory fields are present
-    const mandatoryFields = [
-        email,
-        contactNumber,
-        contactNumberAreaCode,
-        country,
-        walletAddress,
-        blockchainId,
-    ];
+    // Check if mandatory fields are present and are of the correct type
+    const mandatoryFields = {
+        email: 'string',
+        contactNumber: 'number',
+        contactNumberAreaCode: 'number',
+        country: 'string',
+        walletAddress: 'string',
+        blockchainId: 'string',
+    };
 
-    if (mandatoryFields.some((field) => !field)) {
-        return res.badRequest('Missing mandatory fields, please try again');
+    for (const field in mandatoryFields) {
+        if (!req.allParams()[field]) {
+            return res.badRequest(`Missing mandatory field: ${field}`);
+        }
+        if (typeof req.allParams()[field] !== mandatoryFields[field]) {
+            return res.badRequest(`Invalid type for field: ${field}. Expected ${mandatoryFields[field]}`);
+        }
     }
 
     // Check if the user already exists
@@ -39,7 +44,7 @@ async function createUser(req, res) {
                 sqlText: queries.selectUserByEmail.replace('?', `'${email}'`),
                 complete: (err, stmt, rows) => {
                     if (err) {
-                        reject(err);
+                        throw Error(err);
                     } else {
                         resolve(rows);
                     }
@@ -58,26 +63,39 @@ async function createUser(req, res) {
 
     // Insert a new entry in the USER table
     try {
-        await snowflakeConnection.execute({
-            sqlText: queries.insertUser
-                .replace('?', `'${email}'`)
-                .replace('?', contactNumber)
-                .replace('?', contactNumberAreaCode)
-                .replace('?', `'${country}'`),
-        });
-
-        userId = await new Promise((resolve, reject) => {
-            snowflakeConnection.execute({
-                sqlText: queries.selectLastInsertUserId,
-                complete: function (err, stmt, rows) {
+        const result = await new Promise(async (resolve, reject) => {
+            await snowflakeConnection.execute({
+                sqlText: queries.insertUser
+                    .replace('?', `'${email}'`)
+                    .replace('?', contactNumber)
+                    .replace('?', contactNumberAreaCode)
+                    .replace('?', `'${country}'`),
+                complete: async function (err, stmt, rows) {
                     if (err) {
-                        reject(err);
+                        console.log('Error inserting user', err);
+                        throw Error(err);
                     } else {
-                        resolve(rows[0].USER_ID);
+                        snowflakeConnection.execute({
+                            sqlText: queries.selectUserByEmail.replace('?', `'${email}'`),
+                            complete: function (err, stmt, rows) {
+                                if (err) {
+                                    throw Error(err);
+                                } else {
+                                    userId = rows[0].USER_ID;
+                                    resolve(true)
+                                }
+                            },
+                        });
                     }
                 },
             });
         });
+
+        if (!result) {
+            throw Error('Error inserting user');
+        }
+        console.log('User created successfully');
+
     } catch (error) {
         console.log('Error updating/creating user', error);
         return res.serverError(
@@ -94,6 +112,11 @@ async function createUser(req, res) {
                 .replace('?', `'${twitter}'`)
                 .replace('?', `'${instagram}'`)
                 .replace('?', `'${facebook}'`),
+            complete: function (err, stmt, rows) {
+                if (err) {
+                    throw Error(err);
+                }
+            },
         });
     } catch (error) {
         return res.serverError('Error updating/creating user socials');
@@ -106,6 +129,11 @@ async function createUser(req, res) {
                 .replace('?', userId)
                 .replace('?', `'${walletAddress}'`)
                 .replace('?', `'${blockchainId}'`),
+            complete: function (err, stmt, rows) {
+                if (err) {
+                    throw Error(err);
+                }
+            },
         });
     } catch (error) {
         return res.serverError('Error updating/creating user wallet details');

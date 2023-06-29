@@ -22,6 +22,8 @@ module.exports.routes = {
 
     'POST /user/create': 'UserController.createUser',
     'POST /user/delete': 'UserDeletionRequestController.deleteUser',
+    'GET /user/getAll': 'GetAllUsersController.getAllUsers',
+    'GET /user/getAllDeleteAudits': 'GetAllUserDeleteAuditsController.getAllUserDeleteAudits',
 
     /***************************************************************************
      *                                                                          *

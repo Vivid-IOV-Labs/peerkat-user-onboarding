@@ -1,28 +1,34 @@
 const queries = {
-    selectUserByEmail: `
+  selectUserByEmail: `
       SELECT USER_ID
       FROM NFT_USERS.PII."USER"
       WHERE EMAIL = ?
   `,
 
-    selectUserByUserId: `
+  selectAllUsers: 'SELECT * FROM NFT_USERS.PII."USER"',
+
+  countAllUsers: 'SELECT COUNT(*) FROM NFT_USERS.PII."USER"',
+
+  selectAllUserDeleteAudits: 'SELECT * FROM NFT_USERS.PII."USER_DELETION_AUDIT"',
+
+  selectUserByUserId: `
       SELECT *
       FROM NFT_USERS.PII."USER"
       WHERE USER_ID = ?
   `,
 
-    selectUserDeletionRequest: `
+  selectUserDeletionRequest: `
       SELECT *
       FROM NFT_USERS.PII."USER_DELETION_AUDIT"
       WHERE USER_ID = ?
   `,
 
-    insertUser: `
+  insertUser: `
       INSERT INTO NFT_USERS.PII."USER" (EMAIL, CONTACT_NUMBER, CONTACT_NUMBER_AREA_CODE, COUNTRY)
       VALUES (?, ?, ?, ?)
   `,
 
-    updateUser: `
+  updateUser: `
       UPDATE NFT_USERS.PII."USER"
       SET CONTACT_NUMBER = ?,
           CONTACT_NUMBER_AREA_CODE = ?,
@@ -30,12 +36,12 @@ const queries = {
       WHERE USER_ID = ?
   `,
 
-    insertUserSocials: `
+  insertUserSocials: `
       INSERT INTO NFT_USERS.PII."USER_SOCIALS" (USER_ID, TELEGRAM, DISCORD, TWITTER, INSTAGRAM, FACEBOOK)
       VALUES (?, ?, ?, ?, ?, ?)
   `,
 
-    upsertUserSocials: `
+  upsertUserSocials: `
       MERGE INTO NFT_USERS.PII."USER_SOCIALS" AS target
       USING (SELECT ? AS USER_ID) AS source
       ON (target.USER_ID = source.USER_ID)
@@ -51,12 +57,12 @@ const queries = {
           VALUES (?, ?, ?, ?, ?, ?)
   `,
 
-    insertUserWalletDetails: `
+  insertUserWalletDetails: `
       INSERT INTO NFT_USERS.PII."USER_WALLET_DETAILS" (USER_ID, WALLET_ADDRESS, BLOCKCHAIN_ID)
       VALUES (?, ?, ?)
   `,
 
-    upsertUserWalletDetails: `
+  upsertUserWalletDetails: `
       MERGE INTO NFT_USERS.PII."USER_WALLET_DETAILS" AS target
       USING (SELECT ? AS USER_ID) AS source
       ON (target.USER_ID = source.USER_ID)
@@ -69,41 +75,41 @@ const queries = {
           VALUES (?, ?, ?)
   `,
 
-    insertUserDeletionRequest: `
+  insertUserDeletionRequest: `
       INSERT INTO NFT_USERS.PII."USER_DELETION_AUDIT" (USER_ID, DELETE_REQUEST_DATE, DATE_CONFIRMED_FOR_REMOVAL, DATE_OF_DELETION)
       VALUES (?, ?, ?, ?)
   `,
 
-    selectConfirmedDeletionRequests: `
+  selectConfirmedDeletionRequests: `
       SELECT USER_ID, DATE_CONFIRMED_FOR_REMOVAL
       FROM NFT_USERS.PII."USER_DELETION_AUDIT"
       WHERE DATE_CONFIRMED_FOR_REMOVAL IS NOT NULL
   `,
 
-    updateDeletionRequest: `
+  updateDeletionRequest: `
       UPDATE NFT_USERS.PII."USER_DELETION_AUDIT"
       SET DATE_OF_DELETION = ?
       WHERE USER_ID = ?
   `,
 
-    deleteUserSocials: `
+  deleteUserSocials: `
       DELETE FROM NFT_USERS.PII."USER_SOCIALS"
       WHERE USER_ID = ?
   `,
 
-    deleteUserWalletDetails: `
+  deleteUserWalletDetails: `
       DELETE FROM NFT_USERS.PII."USER_WALLET_DETAILS"
       WHERE USER_ID = ?
   `,
 
-    selectLastInsertUserId: `
+  selectLastInsertUserId: `
       SELECT USER_ID
       FROM NFT_USERS.PII."USER"
       ORDER BY USER_ID DESC
       LIMIT 1
   `,
 
-    updateUserSocials: `
+  updateUserSocials: `
       UPDATE NFT_USERS.PII."USER_SOCIALS"
       SET TELEGRAM = ?,
           DISCORD = ?,
@@ -113,7 +119,7 @@ const queries = {
       WHERE USER_ID = ?
   `,
 
-    updateUserWalletDetails: `
+  updateUserWalletDetails: `
       UPDATE NFT_USERS.PII."USER_WALLET_DETAILS"
       SET WALLET_ADDRESS = ?,
           BLOCKCHAIN_ID = ?
