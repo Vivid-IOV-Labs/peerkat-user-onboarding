@@ -45,7 +45,7 @@ async function getAllUsers(req, res) {
             });
         });
 
-        return res.ok({ users: result, totalPages: totalPages });
+        return res.ok({ users: result, totalPages });
 
     } catch (error) {
         console.log('Error fetching users', error);

@@ -17,6 +17,21 @@ async function getAllUserDeleteAudits(req, res) {
 
     const offset = limit * (page - 1);
     try {
+        const totalRequests = await new Promise((resolve, reject) => {
+            snowflakeConnection.execute({
+                sqlText: queries.countAllUserDeleteAuditRequests,
+                complete: (err, stmt, rows) => {
+                    if (err) {
+                        throw Error(err);
+                    } else {
+                        resolve(rows[0]['COUNT(*)']);
+                    }
+                },
+            });
+        });
+
+        const totalPages = Math.ceil(totalRequests / limit);
+
         result = await new Promise((resolve, reject) => {
             snowflakeConnection.execute({
                 sqlText: `${queries.selectAllUserDeleteAudits} LIMIT ${limit} OFFSET ${offset}`, // Add LIMIT and OFFSET to your SQL query
@@ -30,7 +45,7 @@ async function getAllUserDeleteAudits(req, res) {
             });
         });
 
-        return res.ok(result);
+        return res.ok({ requests: result, totalPages });
 
     } catch (error) {
         console.log('Error fetching user delete audits', error);
