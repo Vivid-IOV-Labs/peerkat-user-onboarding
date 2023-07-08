@@ -2,7 +2,6 @@ const queries = require('../../config/queries');
 
 async function confirmDeletionRequest(req, res) {
     const snowflakeConnection = sails.hooks.snowflake.connection;
-
     const { userId } = req.allParams();
 
     try {

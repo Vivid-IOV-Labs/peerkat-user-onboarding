@@ -4,7 +4,7 @@ const MAX_LIMIT = 10000;
 
 async function getAllUserDeleteAudits(req, res) {
     const snowflakeConnection = sails.hooks.snowflake.connection;
-    let { limit, page } = req.query;
+    let { limit, page } = req.allParams();
     let result = [];
 
     limit = limit ? parseInt(limit) : MAX_LIMIT;

@@ -4,7 +4,7 @@ const MAX_LIMIT = 100;
 
 async function getAllUsers(req, res) {
     const snowflakeConnection = sails.hooks.snowflake.connection;
-    let { limit, page } = req.query;
+    let { limit, page } = req.allParams();
     let result = [];
 
     limit = limit ? parseInt(limit) : MAX_LIMIT;
@@ -34,7 +34,7 @@ async function getAllUsers(req, res) {
 
         result = await new Promise((resolve, reject) => {
             snowflakeConnection.execute({
-                sqlText: `${queries.selectAllUsers} LIMIT ${limit} OFFSET ${offset}`,
+                sqlText: queries.getAllUserData.replace('?', limit).replace('?', offset),
                 complete: (err, stmt, rows) => {
                     if (err) {
                         throw Error(err);
